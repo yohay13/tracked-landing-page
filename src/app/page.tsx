@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { analytics, EVENTS } from '@/lib/analytics';
+import { track as weaverTrack } from '@weaver/sdk';
 
 export default function LandingPage() {
   const router = useRouter();
@@ -10,6 +11,9 @@ export default function LandingPage() {
   useEffect(() => {
     analytics.pageView('Landing');
     analytics.track(EVENTS.LANDING_PAGE_VIEWED, {
+      source: 'direct',
+    });
+    weaverTrack(EVENTS.LANDING_PAGE_VIEWED, {
       source: 'direct',
     });
   }, []);
@@ -22,6 +26,13 @@ export default function LandingPage() {
     analytics.track(EVENTS.QUIZ_STARTED, {
       source: 'landing_page',
     });
+    weaverTrack(EVENTS.CTA_CLICKED, {
+      buttonText: 'Start Your Journey',
+      location: 'hero',
+    });
+    weaverTrack(EVENTS.QUIZ_STARTED, {
+      source: 'landing_page',
+    });
     router.push('/quiz/1');
   };
 
@@ -32,6 +43,10 @@ export default function LandingPage() {
         <button
           onClick={() => {
             analytics.track(EVENTS.BUTTON_CLICKED, {
+              buttonText: 'View Plans',
+              location: 'nav',
+            });
+            weaverTrack(EVENTS.BUTTON_CLICKED, {
               buttonText: 'View Plans',
               location: 'nav',
             });
@@ -75,6 +90,10 @@ export default function LandingPage() {
                 className="text-center p-6 rounded-lg bg-gray-50"
                 onClick={() => {
                   analytics.track(EVENTS.BUTTON_CLICKED, {
+                    buttonText: item.title,
+                    location: 'features',
+                  });
+                  weaverTrack(EVENTS.BUTTON_CLICKED, {
                     buttonText: item.title,
                     location: 'features',
                   });

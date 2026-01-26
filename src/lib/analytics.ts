@@ -1,6 +1,8 @@
 // Centralized Analytics Service - Mock Mixpanel Implementation
 // Replace with real Mixpanel SDK in production
 
+import { track as weaverTrack } from '@weaver/sdk';
+
 type EventPropertyValue = string | number | boolean | null | EventPropertyValue[] | { [key: string]: EventPropertyValue };
 type EventProperties = Record<string, EventPropertyValue>;
 
@@ -33,11 +35,18 @@ class Analytics {
 
     this.log('INIT', { token, timestamp: new Date().toISOString() });
     this.initialized = true;
+    weaverTrack('Mixpanel Initialized', { token, timestamp: new Date().toISOString() });
   }
 
   identify(userId: string, traits?: AnalyticsUser): void {
     this.userId = userId;
     this.log('IDENTIFY', {
+      userId,
+      traits,
+      sessionId: this.sessionId,
+      timestamp: new Date().toISOString(),
+    });
+    weaverTrack('User Identified', {
       userId,
       traits,
       sessionId: this.sessionId,
@@ -57,6 +66,7 @@ class Analytics {
       },
     };
     this.log('TRACK', payload);
+    weaverTrack(eventName, payload.properties);
   }
 
   // Page view tracking
@@ -71,6 +81,7 @@ class Analytics {
     this.userId = null;
     this.sessionId = this.generateSessionId();
     this.log('RESET', { newSessionId: this.sessionId });
+    weaverTrack('Analytics Reset', { newSessionId: this.sessionId });
   }
 }
 
@@ -107,4 +118,4 @@ export const EVENTS = {
   // General
   BUTTON_CLICKED: 'Button Clicked',
   ERROR_OCCURRED: 'Error Occurred',
-} as const;
+}

@@ -5,6 +5,7 @@ import { useRouter, useParams } from 'next/navigation';
 import { analytics, EVENTS } from '@/lib/analytics';
 import { quizQuestions } from '@/lib/quiz-data';
 import { useCart } from '@/context/CartContext';
+import { track as weaverTrack } from '@weaver/sdk';
 
 export default function QuizPage() {
   const router = useRouter();
@@ -25,6 +26,11 @@ export default function QuizPage() {
 
     analytics.pageView(`Quiz Step ${step}`);
     analytics.track(EVENTS.QUIZ_STEP_VIEWED, {
+      step,
+      totalSteps,
+      question: question.question,
+    });
+    weaverTrack(EVENTS.QUIZ_STEP_VIEWED, {
       step,
       totalSteps,
       question: question.question,
@@ -52,11 +58,19 @@ export default function QuizPage() {
       step,
       answer: selectedOption,
     });
+    weaverTrack(EVENTS.QUIZ_STEP_COMPLETED, {
+      step,
+      answer: selectedOption,
+    });
 
     if (step < totalSteps) {
       router.push(`/quiz/${step + 1}`);
     } else {
       analytics.track(EVENTS.QUIZ_COMPLETED, {
+        answers: quizAnswers,
+        totalSteps,
+      });
+      weaverTrack(EVENTS.QUIZ_COMPLETED, {
         answers: quizAnswers,
         totalSteps,
       });
@@ -69,6 +83,9 @@ export default function QuizPage() {
       router.push(`/quiz/${step - 1}`);
     } else {
       analytics.track(EVENTS.QUIZ_ABANDONED, {
+        abandonedAtStep: step,
+      });
+      weaverTrack(EVENTS.QUIZ_ABANDONED, {
         abandonedAtStep: step,
       });
       router.push('/');

@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { analytics, EVENTS } from '@/lib/analytics';
 import { plans, addOns } from '@/lib/quiz-data';
 import { useCart } from '@/context/CartContext';
+import { track as weaverTrack } from '@weaver/sdk';
 
 export default function PlansPage() {
   const router = useRouter();
@@ -13,6 +14,10 @@ export default function PlansPage() {
   useEffect(() => {
     analytics.pageView('Plans');
     analytics.track(EVENTS.PLANS_VIEWED, {
+      plansCount: plans.length,
+      addOnsCount: addOns.length,
+    });
+    weaverTrack(EVENTS.PLANS_VIEWED, {
       plansCount: plans.length,
       addOnsCount: addOns.length,
     });
@@ -49,7 +54,17 @@ export default function PlansPage() {
       planId: selectedPlan,
       itemCount: items.length + 1,
     });
+    weaverTrack(EVENTS.CHECKOUT_STARTED, {
+      planId: selectedPlan,
+      itemCount: items.length + 1,
+    });
 
+    router.push('/cart');
+  };
+
+  const handleCartView = () => {
+    analytics.track(EVENTS.CART_VIEWED, { source: 'nav' });
+    weaverTrack(EVENTS.CART_VIEWED, { source: 'nav' });
     router.push('/cart');
   };
 
@@ -65,10 +80,7 @@ export default function PlansPage() {
           </button>
           <h1 className="text-xl font-bold text-gray-800">Choose Your Plan</h1>
           <button
-            onClick={() => {
-              analytics.track(EVENTS.CART_VIEWED, { source: 'nav' });
-              router.push('/cart');
-            }}
+            onClick={handleCartView}
             className="text-blue-600 hover:text-blue-800"
           >
             Cart ({items.length})

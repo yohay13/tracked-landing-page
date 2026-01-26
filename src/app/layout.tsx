@@ -3,6 +3,8 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { CartProvider } from "@/context/CartContext";
 import { AnalyticsProvider } from "@/components/AnalyticsProvider";
+// Importing Weaver configuration for auto-initialization
+import '../weaver';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",

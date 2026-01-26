@@ -3,7 +3,10 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { analytics, EVENTS } from '@/lib/analytics';
+import { initWeaver, track as weaverTrack, identify as weaverIdentify, page as weaverPage } from '@weaver/sdk';
 import { useCart } from '@/context/CartContext';
+
+const weaver = initWeaver({ apiKey: 'wvr_test_api_key_12345' });
 
 export default function CartPage() {
   const router = useRouter();
@@ -18,6 +21,12 @@ export default function CartPage() {
       cartTotal: total,
       source: 'direct',
     });
+    weaverPage('Cart');
+    weaverTrack(EVENTS.CART_VIEWED, {
+      itemCount: items.length,
+      cartTotal: total,
+      source: 'direct',
+    });
   }, [items.length, total]);
 
   const handleCheckout = async () => {
@@ -28,11 +37,22 @@ export default function CartPage() {
       cartTotal: total,
       items: items.map((i) => ({ id: i.id, name: i.name, price: i.price, qty: i.quantity })),
     });
+    weaverTrack(EVENTS.CHECKOUT_STARTED, {
+      itemCount: items.length,
+      cartTotal: total,
+      items: items.map((i) => ({ id: i.id, name: i.name, price: i.price, qty: i.quantity })),
+    });
 
     // Simulate checkout process
     await new Promise((resolve) => setTimeout(resolve, 2000));
 
     analytics.track(EVENTS.CHECKOUT_COMPLETED, {
+      orderId: `order_${Date.now()}`,
+      itemCount: items.length,
+      orderTotal: total,
+      items: items.map((i) => i.id),
+    });
+    weaverTrack(EVENTS.CHECKOUT_COMPLETED, {
       orderId: `order_${Date.now()}`,
       itemCount: items.length,
       orderTotal: total,
@@ -56,6 +76,10 @@ export default function CartPage() {
           <button
             onClick={() => {
               analytics.track(EVENTS.BUTTON_CLICKED, {
+                buttonText: 'Back to Home',
+                location: 'order_complete',
+              });
+              weaverTrack(EVENTS.BUTTON_CLICKED, {
                 buttonText: 'Back to Home',
                 location: 'order_complete',
               });

@@ -2,6 +2,9 @@
 
 import { createContext, useContext, useState, ReactNode } from 'react';
 import { analytics, EVENTS } from '@/lib/analytics';
+import { initWeaver, track as weaverTrack, identify as weaverIdentify, page as weaverPage } from '@weaver/sdk';
+
+const weaver = initWeaver({ apiKey: 'wvr_test_api_key_12345' });
 
 export interface CartItem {
   id: string;
@@ -46,6 +49,11 @@ export function CartProvider({ children }: { children: ReactNode }) {
       itemName: item.name,
       price: item.price,
     });
+    weaverTrack(EVENTS.ITEM_ADDED_TO_CART, {
+      itemId: item.id,
+      itemName: item.name,
+      price: item.price,
+    });
   };
 
   const removeItem = (id: string) => {
@@ -54,6 +62,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
     if (item) {
       analytics.track(EVENTS.ITEM_REMOVED_FROM_CART, {
+        itemId: id,
+        itemName: item.name,
+      });
+      weaverTrack(EVENTS.ITEM_REMOVED_FROM_CART, {
         itemId: id,
         itemName: item.name,
       });
@@ -73,6 +85,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
       itemId: id,
       newQuantity: quantity,
     });
+    weaverTrack(EVENTS.CART_UPDATED, {
+      itemId: id,
+      newQuantity: quantity,
+    });
   };
 
   const setSelectedPlan = (planId: string) => {
@@ -84,8 +100,15 @@ export function CartProvider({ children }: { children: ReactNode }) {
         previousPlan,
         newPlan: planId,
       });
+      weaverTrack(EVENTS.PLAN_CHANGED, {
+        previousPlan,
+        newPlan: planId,
+      });
     } else {
       analytics.track(EVENTS.PLAN_SELECTED, {
+        planId,
+      });
+      weaverTrack(EVENTS.PLAN_SELECTED, {
         planId,
       });
     }
@@ -95,6 +118,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
     setQuizAnswers((prev) => ({ ...prev, [step]: answer }));
 
     analytics.track(EVENTS.QUIZ_ANSWER_SELECTED, {
+      step,
+      answer,
+    });
+    weaverTrack(EVENTS.QUIZ_ANSWER_SELECTED, {
       step,
       answer,
     });

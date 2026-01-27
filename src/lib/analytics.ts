@@ -1,5 +1,8 @@
 // Centralized Analytics Service - Mock Mixpanel Implementation
 // Replace with real Mixpanel SDK in production
+import { initWeaver, track as weaverTrack, identify as weaverIdentify, page as weaverPage } from '@yohay13/weaver-sdk';
+
+const weaver = initWeaver({ apiKey: 'wvr_test_api_key_12345' });
 
 type EventPropertyValue = string | number | boolean | null | EventPropertyValue[] | { [key: string]: EventPropertyValue };
 type EventProperties = Record<string, EventPropertyValue>;
@@ -32,6 +35,8 @@ class Analytics {
     if (this.initialized) return;
 
     this.log('INIT', { token, timestamp: new Date().toISOString() });
+    // Weaver
+    // weaverInit(token);
     this.initialized = true;
   }
 
@@ -43,6 +48,7 @@ class Analytics {
       sessionId: this.sessionId,
       timestamp: new Date().toISOString(),
     });
+    weaverIdentify(userId, traits);
   }
 
   track(eventName: string, properties?: EventProperties): void {
@@ -57,6 +63,7 @@ class Analytics {
       },
     };
     this.log('TRACK', payload);
+    weaverTrack(eventName, properties);
   }
 
   // Page view tracking
@@ -65,6 +72,7 @@ class Analytics {
       pageName,
       ...properties,
     });
+    weaverPage(pageName, properties);
   }
 
   reset(): void {

@@ -4,6 +4,9 @@ import "./globals.css";
 import { CartProvider } from "@/context/CartContext";
 import { AnalyticsProvider } from "@/components/AnalyticsProvider";
 
+// Import Weaver config to auto-initialize Weaver analytics
+import './weaver';
+
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],

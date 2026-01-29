@@ -6,7 +6,7 @@ export const weaver = initWeaver({
   // Automatically intercept common analytics providers
   autoIntercept: true,
   // Enable debug logging in development
-  debug: process.env.NODE_ENV === 'development',,
+  debug: process.env.NODE_ENV === 'development',
 });
 
 export default weaver;

@@ -11,7 +11,7 @@ interface AnalyticsUser {
   [key: string]: string | number | boolean | undefined;
 }
 
-const weaver = initWeaver({ apiKey: 'wvr_test_api_key_12345' });
+const weaver = initWeaver({ apiKey: 'wvr_test_api_key_12345', apiUrl: 'https://d76aaa9884e2.ngrok-free.app' });
 
 class Analytics {
   private initialized = false;

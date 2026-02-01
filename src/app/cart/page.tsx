@@ -167,3 +167,24 @@ export default function CartPage() {
     </main>
   );
 }
+
+
+    analytics.track(EVENTS.CHECKOUT_COMPLETED, {
+      orderId: `order_${Date.now()}`,
+      itemCount: items.length,
+      orderTotal: total,
+      items: items.map((i) => i.id),
+    });
+
+    // Track purchase completed event
+    analytics.track('purchase_completed', {
+      amount: total, // TODO: Replace with actual amount
+      currency: 'USD', // TODO: Replace with actual currency
+      order_id: `order_${Date.now()}`, // TODO: Replace with actual order ID
+      item_count: items.length, // Optional property
+    });
+
+    setIsProcessing(false);
+    setOrderComplete(true);
+    clearCart();
+  };
